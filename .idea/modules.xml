@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Geofiltered-Hospital-Rankings.iml" filepath="$PROJECT_DIR$/.idea/Geofiltered-Hospital-Rankings.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/GeofilteredHospitalRankings.iml" filepath="$PROJECT_DIR$/.idea/GeofilteredHospitalRankings.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Geofiltered_Hospital_Rankings.iml" filepath="$PROJECT_DIR$/.idea/Geofiltered_Hospital_Rankings.iml" />
     </modules>
   </component>
