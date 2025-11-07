@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include "hospital.h"
 #include "csv_parser.h"
-#include "parsing.h"
+#include "geofilter.h"
 #include "user_prefs.h"
 #include "assign_coords.h"
 #include "city_coords.h"
