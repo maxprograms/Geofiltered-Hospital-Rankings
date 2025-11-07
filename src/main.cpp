@@ -933,8 +933,8 @@ int main() {
                                 window.draw(Instruction2);
                             }
                             if (DSindicator == 2) {
-                                sf::Text Instruction2("You have selected "+ DS, font, 20);
-                                Instruction2.setFillColor(sf::Color::Blue);
+                                sf::Text Instruction2("You have selected "+ DS, font, 25);
+                                Instruction2.setFillColor(sf::Color::Black);
                                 Instruction2.setStyle(sf::Text::Bold);
                                 sf::FloatRect Instruction2Bounds = Instruction2.getLocalBounds();
                                 Instruction2.setPosition((1200- Instruction2Bounds.width) / 2, 500);
