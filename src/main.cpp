@@ -917,7 +917,7 @@ int main() {
                             Title.setPosition((1200- TitleBounds.width) / 2, 50);
                             window.draw(Title);
 
-                            sf::Text Instruction("To use a geohash data structure press 1 and enter. To use an Octree data structure press 2 and enter", font, 20);
+                            sf::Text Instruction("To use a geohash data structure press 1 and enter. To use an Octree data structure press 2 and enter", font, 22);
                             Instruction.setFillColor(sf::Color::Blue);
                             Instruction.setStyle(sf::Text::Bold);
                             sf::FloatRect InstructionBounds = Instruction.getLocalBounds();
@@ -925,8 +925,8 @@ int main() {
                             window.draw(Instruction);
 
                             if (DSindicator == 1) {
-                                sf::Text Instruction2("You have selected "+ DS, font, 20);
-                                Instruction2.setFillColor(sf::Color::Blue);
+                                sf::Text Instruction2("You have selected "+ DS, font, 25);
+                                Instruction2.setFillColor(sf::Color::Black);
                                 Instruction2.setStyle(sf::Text::Bold);
                                 sf::FloatRect Instruction2Bounds = Instruction2.getLocalBounds();
                                 Instruction2.setPosition((1200- Instruction2Bounds.width) / 2, 500);
