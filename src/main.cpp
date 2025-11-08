@@ -20,15 +20,11 @@
 #include "globals.h"
 using namespace std;
 
-
+//Global variabless
 double userLat = 0.0;
 double userLon = 0.0;
 string userCityState = "";
-
-
-
 vector<HospitalResult> topHospitals;
-
 constexpr double MILE_TO_KM = 1.60934;
 
 
@@ -83,6 +79,8 @@ int main() {
     sf::FloatRect promptBound = promptText.getLocalBounds();
     promptText.setPosition(((1200 - promptBound.width) / 2)-50, 700);
 
+    
+    //More global variables to be used throughout the program
     int choice;
     vector<int> weights = {3, 3, 3, 3, 3, 3};
     int selectedHospitalInd = -1;
@@ -541,19 +539,23 @@ int main() {
                             title.setPosition((1200 - titleBounds.width) / 2, 50);
                             window.draw(title);
 
+                            //if user has not inputted city name, state initial, or distance - warn user
                             if (!citySelected) {
                                 sf::Text warning("Please set your location first!", font, 30);
                                 warning.setFillColor(sf::Color::Red);
                                 sf::FloatRect warningBounds = warning.getLocalBounds();
                                 warning.setPosition((1200 - warningBounds.width) / 2, 350);
-                                window.draw(warning);
-                            } else if (topHospitals.empty()) {
+                                window.draw(warning);  
+                            }
+                            // Display error message if invalid 
+                            else if (topHospitals.empty()) {
                                 sf::Text info("No hospitals found within " + to_string(userDistanceMiles) + " miles of " + city + ".", font, 30);
                                 info.setFillColor(sf::Color::Black);
                                 sf::FloatRect infoBounds = info.getLocalBounds();
                                 info.setPosition((1200 - infoBounds.width) / 2, 200);
                                 window.draw(info);
                             }
+                            //Display top 5 hospital window
                             else {
                                 sf::Text subtitle("Top " + to_string(topHospitals.size()) + " hospitals near " + city + " (" +to_string(userDistanceMiles) + " miles radius)", font, 24);
                                 subtitle.setFillColor(sf::Color::Blue);
@@ -618,7 +620,7 @@ int main() {
                                     window.draw(scoreDistText);
                                 }
                             }
-
+                            //run time calculated for each data structure
                             if (runtime > 0.0f) {
                                 stringstream rtStream;
                                 rtStream.precision(3);
@@ -636,6 +638,7 @@ int main() {
                             escText.setPosition((1200-escBound.width) / 2, 750);
                             window.draw(escText);
 
+                            //Ask user to select rank 1-5 to display more details in option 4
                             if (!city.empty() && !topHospitals.empty() && !stateInitials.empty()) {
                                 sf::Text rankChosen("Select option 1-5 to view hospital in more detail. To see details return to main menu and select option 4.",
                                                                         font, 23);
@@ -774,7 +777,7 @@ int main() {
                         }
                     }
 
-                    //Option 5 - Export Results
+                    //Option 5 - Export results to a txt file
                     if (choice == 5) {
                         sf::Event clearEvent;
                         while (window.pollEvent(clearEvent)) {}
@@ -793,6 +796,8 @@ int main() {
                                 }
 
                                 if (Opt5Event.type == sf::Event::KeyPressed && Opt5Event.key.code == sf::Keyboard::Enter) {
+
+                                    //If user inputs y, it will create a txt file and write information in the txt to display
                                     if (userInput == "Y" || userInput == "y") {
                                         if (!citySelected || userDistanceMiles == 0) {
                                         } else {
@@ -865,6 +870,7 @@ int main() {
                             title.setPosition((1200 - titleBounds.width) / 2, 50);
                             window.draw(title);
 
+                            //If the user has not inputted a city, state initial, or distance
                             if (!citySelected || userDistanceMiles == 0) {
                                 sf::Text error("Cannot export, Location not set! Please complete option 1 and try again.", font, 30);
                                 error.setFillColor(sf::Color::Red);
@@ -1021,7 +1027,7 @@ int main() {
                                     Option7 = false;
                                 }
                             }
-                            // Draw About screen
+                            // Display About screen
                             window.clear(sf::Color::White);
 
                             sf::Text aboutTitle("About MedMetrics |+|", font, 40);
@@ -1048,7 +1054,6 @@ int main() {
                             descText.setPosition((1200 -descBounds.width) / 2, 130);
                             window.draw(descText);
 
-                            // Developed by
                             sf::Text devTitle("Developed by:", font, 40);
                             devTitle.setFillColor(sf::Color::Blue);
                             devTitle.setStyle(sf::Text::Bold);
