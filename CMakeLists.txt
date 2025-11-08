@@ -24,6 +24,7 @@ add_executable(GeofilteredHospitalRankings
         src/assign_coords.cpp
         src/city_coords.cpp
         src/csv_parser.cpp
+        src/geofilter.cpp
 )
 target_compile_features(GeofilteredHospitalRankings PRIVATE cxx_std_11)
 
