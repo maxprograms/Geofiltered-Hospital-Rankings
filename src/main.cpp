@@ -123,7 +123,6 @@ int main() {
     separator2.setFillColor(sf::Color::Black);
     separator2.setPosition(50, 200);
 
-    // Menu
     sf::Text menuText("1. Set Location\n"
                        "2. Customize Hospital Priorities\n"
                        "3. View Recommended Hospitals\n"
@@ -148,7 +147,7 @@ int main() {
     int DSindicator = 1;
     string city = "";
     int userDistanceMiles = 0;
-
+    string stateInitials = "";
     bool citySelected = false;
     // Main loop
     while (window.isOpen()) {
@@ -166,11 +165,13 @@ int main() {
                         while (window.pollEvent(clearEvent)) {}
 
                         string inputName = "";
+                        string inputState = "";
                         string inputDistance = "";
                         string cityNameDisplay = "";
                         bool Option1 = true;
                         bool nameFound = false;
                         bool distanceEnter = false;
+                        bool stateEnter = false;
                         bool nameEnteredOnce = false;
 
                         while (Option1 && window.isOpen()) {
@@ -185,44 +186,54 @@ int main() {
                                 }
 
                                 if (Opt1Event.type == sf::Event::KeyPressed && Opt1Event.key.code == sf::Keyboard::Enter) {
-                                    if (!inputName.empty() && !nameFound) {
+                                    if (!inputName.empty() && !stateEnter) {
+                                        stateEnter = true;
+                                    }
+                                    else if (stateEnter && !inputState.empty() && !nameFound) {
                                         nameEnteredOnce = true;
-                                        if (findCityCoords(inputName, coords, userLat, userLon, userCityState)) {
+                                        if (findCityCoords(inputName, inputState, coords, userLat, userLon, userCityState)) {
                                             nameFound = true;
                                             cityNameDisplay = inputName;
                                             city = inputName;
+                                            stateInitials = inputState;
                                             cityNameDisplay[0] = toupper(cityNameDisplay[0]);
                                         }
                                         else {
                                             inputName = "";
+                                            inputState = "";
+                                            stateEnter = false;
                                         }
                                     }
-
                                     else if (nameFound && !inputDistance.empty() && !distanceEnter) {
-                                        try {
+                                        bool isValidNumber = true;
+                                        for (char c : inputDistance) {
+                                            if (c < '0' || c > '9') {
+                                                isValidNumber = false;
+                                                break;
+                                            }
+                                        }
+
+                                        if (isValidNumber) {
                                             int distanceValue = stoi(inputDistance);
                                             if (distanceValue > 0 && distanceValue < 1000) {
                                                 distanceEnter = true;
                                                 userDistanceMiles = distanceValue;
-                                            } else {
+                                            }
+                                            else {
                                                 inputDistance = "";
                                             }
-                                        } catch (...) {
+                                        }
+                                        else {
                                             inputDistance = "";
                                         }
                                     }
                                 }
 
-                                // City name input
-                                if (!nameFound && Opt1Event.type == sf::Event::TextEntered) {
+                                if (!stateEnter && Opt1Event.type == sf::Event::TextEntered) {
                                     if (Opt1Event.text.unicode == '\b' && !inputName.empty()) {
                                         inputName.pop_back();
                                     }
-                                    else if (inputName.length() < 25 &&
-                                            ((Opt1Event.text.unicode >= 'a' && Opt1Event.text.unicode <= 'z') ||
-                                             (Opt1Event.text.unicode >= 'A' && Opt1Event.text.unicode <= 'Z') ||
-                                             (Opt1Event.text.unicode == ' '))) {
-
+                                    else if (inputName.length() < 25 && ((Opt1Event.text.unicode >= 'a' && Opt1Event.text.unicode <= 'z') || (Opt1Event.text.unicode >= 'A' && Opt1Event.text.unicode <= 'Z') || (Opt1Event.text.unicode == ' '))) {
                                         char c = static_cast<char>(Opt1Event.text.unicode);
                                         if (inputName.empty() || inputName.back() == ' ') {
                                             inputName += toupper(c);
@@ -233,7 +244,16 @@ int main() {
                                     }
                                 }
 
-                                // Handle distance input - only allow digits 0-9
+                                if (stateEnter && !nameFound && Opt1Event.type == sf::Event::TextEntered) {
+                                    if (Opt1Event.text.unicode == '\b' && !inputState.empty()) {
+                                        inputState.pop_back();
+                                    }
+                                    else if (inputState.length() < 2 &&
+                                            ((Opt1Event.text.unicode >= 'a' && Opt1Event.text.unicode <= 'z') || (Opt1Event.text.unicode >= 'A' && Opt1Event.text.unicode <= 'Z'))) {
+                                        inputState += static_cast<char>(toupper(Opt1Event.text.unicode));
+                                    }
+                                }
+
                                 if (nameFound && !distanceEnter && Opt1Event.type == sf::Event::TextEntered) {
                                     if (Opt1Event.text.unicode == '\b' && !inputDistance.empty()) {
                                         inputDistance.pop_back();
@@ -253,7 +273,7 @@ int main() {
                             title.setPosition((1200 - titleBound.width) / 2, 50);
                             window.draw(title);
 
-                            if (!nameFound  && !nameEnteredOnce) {
+                            if (!nameFound  && !nameEnteredOnce && !stateEnter) {
                                 sf::Text prompt1("Enter your city name:", font, 30);
                                 prompt1.setFillColor(sf::Color::Black);
                                 sf::FloatRect prompt1Bounds = prompt1.getLocalBounds();
@@ -273,62 +293,88 @@ int main() {
                                 } else {
                                     displayText = inputName;
                                 }
-
                                 sf::Text inputDisplay(displayText, font, 28);
-
-                                sf::Color textColor;
-                                if (inputName.empty()) {
-                                    textColor = sf::Color(150, 150, 150);
-                                } else {
-                                    textColor = sf::Color::Black;
-                                }
-                                inputDisplay.setFillColor(textColor);
-
+                                inputDisplay.setFillColor(sf::Color::Black);
                                 inputDisplay.setPosition(310, 225);
                                 window.draw(inputDisplay);
 
-                                sf::Text instruction("Press ENTER to search", font, 20);
+                                sf::Text instruction("Press ENTER to enter state", font, 20);
                                 instruction.setFillColor(sf::Color::Green);
                                 instruction.setPosition(500, 300);
                                 window.draw(instruction);
+                            }
+                            else if (stateEnter && !nameFound && !nameEnteredOnce) {
+                                // State input screen
+                                sf::Text statePrompt("Enter your state initials for " + inputName + ":", font, 30);
+                                statePrompt.setFillColor(sf::Color::Black);
+                                sf::FloatRect statePromptBounds = statePrompt.getLocalBounds();
+                                statePrompt.setPosition((1200 - statePromptBounds.width) / 2, 150);
+                                window.draw(statePrompt);
 
-                            } else if (!nameFound && nameEnteredOnce) {
-                                // City was not found
-                                sf::Text error("City not found. Try again or check spelling.", font, 30);
+                                sf::RectangleShape stateBox(sf::Vector2f(400, 50));
+                                stateBox.setFillColor(sf::Color(240, 240, 240));
+                                stateBox.setOutlineColor(sf::Color::Blue);
+                                stateBox.setOutlineThickness(2);
+                                stateBox.setPosition((1200 - 400) / 2, 220);
+                                window.draw(stateBox);
+
+                                string displayText;
+                                if (inputState.empty()) {
+                                    displayText = "Type Here (e.g., FL)";
+                                } else {
+                                    displayText = inputState;
+                                }
+
+                                sf::Text stateDisplay(displayText, font, 28);
+                                stateDisplay.setFillColor(sf::Color::Black);
+                                sf::FloatRect textBounds = stateDisplay.getLocalBounds();
+                                stateDisplay.setPosition((1200 - textBounds.width) / 2, 225);
+                                window.draw(stateDisplay);
+
+                                sf::Text instruction("Press ENTER to search", font, 20);
+                                instruction.setFillColor(sf::Color::Green);
+                                instruction.setPosition((1200 - instruction.getLocalBounds().width) / 2, 300);
+                                window.draw(instruction);
+                            }
+                            else if (!nameFound && nameEnteredOnce) {
+                                // Error screen
+                                sf::Text error("Location not found. Try again or check spelling.", font, 30);
                                 error.setFillColor(sf::Color::Red);
                                 sf::FloatRect errorBounds = error.getLocalBounds();
                                 error.setPosition((1200 - errorBounds.width) / 2, 200);
                                 window.draw(error);
 
-                                sf::Text errorInstruction("Press ESC to return to main menu", font, 20);
-                                errorInstruction.setFillColor(sf::Color::Green);
-                                errorInstruction.setPosition(450, 250);
-                                window.draw(errorInstruction);
                                 citySelected = false;
                             }
                             else if (nameFound && !distanceEnter) {
-
-                                sf::Text prompt2("Enter maximum distance (miles) from " + cityNameDisplay + ":", font, 30);
-                                prompt2.setFillColor(sf::Color::Black);
-                                sf::FloatRect prompt2Bounds = prompt2.getLocalBounds();
-                                prompt2.setPosition((1200 - prompt2Bounds.width) / 2, 150);
-                                window.draw(prompt2);
+                                sf::Text distancePrompt("Enter maximum distance (miles) from " + cityNameDisplay + ":", font, 30);
+                                distancePrompt.setFillColor(sf::Color::Black);
+                                sf::FloatRect distancePromptBounds = distancePrompt.getLocalBounds();
+                                distancePrompt.setPosition((1200 - distancePromptBounds.width) / 2, 150);
+                                window.draw(distancePrompt);
 
                                 sf::RectangleShape distanceBox(sf::Vector2f(200, 50));
                                 distanceBox.setFillColor(sf::Color(240, 240, 240));
                                 distanceBox.setOutlineColor(sf::Color::Blue);
                                 distanceBox.setOutlineThickness(2);
-                                distanceBox.setPosition(500, 220);
+                                distanceBox.setPosition((1000) / 2, 220);
                                 window.draw(distanceBox);
 
-                                sf::Text distanceDisplay(inputDistance.empty() ? "Type Here" : inputDistance, font, 28);
-                                distanceDisplay.setFillColor(inputDistance.empty() ? sf::Color(150, 150, 150) : sf::Color::Black);
-                                distanceDisplay.setPosition(510, 225);
+                                string displayText;
+                                if (inputDistance.empty()) {
+                                    displayText = "Type Here";
+                                } else {
+                                    displayText = inputDistance;
+                                }
+                                sf::Text distanceDisplay(displayText, font, 28);
+                                distanceDisplay.setFillColor(sf::Color::Black);
+                                sf::FloatRect distTextBounds = distanceDisplay.getLocalBounds();
+                                distanceDisplay.setPosition((1200 - distTextBounds.width) / 2, 225);
                                 window.draw(distanceDisplay);
 
                                 sf::Text instruction("Press ENTER to confirm", font, 20);
                                 instruction.setFillColor(sf::Color::Green);
-                                instruction.setPosition(500, 300);
+                                instruction.setPosition((1200 - instruction.getLocalBounds().width) / 2, 300);
                                 window.draw(instruction);
                             }
 
@@ -482,7 +528,6 @@ int main() {
                             currentWeight.setPosition((1200 - currentWeightBounds.width) / 2, 530);
                             window.draw(currentWeight);
 
-                            // Input area
                             sf::Text inputLabel("Enter new value (1-5):", font, 22);
                             inputLabel.setFillColor(sf::Color::Green);
                             sf::FloatRect inputBounds = inputLabel.getLocalBounds();
@@ -551,11 +596,11 @@ int main() {
                             window.draw(title);
 
                             if (!citySelected) {
-                                sf::Text warn("Please set your location first!", font, 30);
-                                warn.setFillColor(sf::Color::Red);
-                                sf::FloatRect warnBounds = warn.getLocalBounds();
-                                warn.setPosition((1200 - warnBounds.width) / 2, 350);
-                                window.draw(warn);
+                                sf::Text warning("Please set your location first!", font, 30);
+                                warning.setFillColor(sf::Color::Red);
+                                sf::FloatRect warningBounds = warning.getLocalBounds();
+                                warning.setPosition((1200 - warningBounds.width) / 2, 350);
+                                window.draw(warning);
                             } else if (topHospitals.empty()) {
                                 sf::Text info("No hospitals found within " + to_string(userDistanceMiles) + " miles of " + city + ".", font, 30);
                                 info.setFillColor(sf::Color::Black);
@@ -595,7 +640,7 @@ int main() {
                                 scoreCol.setPosition(900, 180);
                                 window.draw(scoreCol);
 
-                                // Display the top 10 hospitals
+                                // Display the top 5 hospitals
                                 for (size_t i = 0; i < topHospitals.size(); ++i) {
                                     const auto& result = topHospitals[i];
                                     int yPos = 220 + i * 40;
@@ -781,6 +826,7 @@ int main() {
                                                 file << "Location Information:\n";
                                                 file << "---------------------\n";
                                                 file << "City: " << city << "\n";
+                                                file << "State: " << stateInitials << "\n";
                                                 file << "Search Radius: " << userDistanceMiles << " miles\n\n";
 
                                                 file << "Category Weights (1-5):\n";
@@ -1082,7 +1128,7 @@ int main() {
             window.draw(promptText);
 
             if (citySelected) {
-                sf::Text locationStatus("Location Set: " + city + " (" + to_string(userDistanceMiles) + " miles)", font, 20);
+                sf::Text locationStatus("Location Set: " + city +", " + stateInitials + " (" + to_string(userDistanceMiles) + " miles)", font, 20);
                 locationStatus.setFillColor(sf::Color(0, 100, 0));
                 sf::FloatRect statusBounds = locationStatus.getLocalBounds();
                 locationStatus.setPosition((1200 - statusBounds.width) / 2, 230);
