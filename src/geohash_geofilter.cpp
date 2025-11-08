@@ -7,7 +7,7 @@
 #include <unordered_set>
 #include <map>
 #include <array>
-// Earth radius in kilometers
+
 constexpr double EARTH_RADIUS_KM = 6371.0;
 
 #ifndef M_PI
@@ -31,27 +31,6 @@ double haversine(double lat1, double lon1, double lat2, double lon2) {
     double c = 2 * std::atan2(std::sqrt(a), std::sqrt(1 - a));
 
     return EARTH_RADIUS_KM * c;
-}
-
-std::vector<Hospital> filterByDistance(
-    const std::vector<Hospital>& hospitals,
-    double userLat,
-    double userLon,
-    double radiusKm
-) {
-    std::vector<Hospital> result;
-    result.reserve(hospitals.size() / 10);
-
-    for (const auto& h : hospitals) {
-        if (h.latitude == 0.0 && h.longitude == 0.0) continue;
-
-        double distance = haversine(userLat, userLon, h.latitude, h.longitude);
-
-        if (distance <= radiusKm) {
-            result.push_back(h);
-        }
-    }
-    return result;
 }
 
 static const char* GEOHASH_BASE32 = "0123456789bcdefghjkmnpqrstuvwxyz";
@@ -100,7 +79,6 @@ std::string encodeGeohash(double latitude, double longitude, int precision) {
     return geohash;
 }
 
-// Lookup tables for Geohash neighbor calculation (Index: [direction][parity])
 static const std::map<std::string, std::array<std::string, 2>> BORDERS = {
     {"N", {"prxz", "bcfguvyz"}},
     {"S", {"028b", "0145hjnp"}},
@@ -108,7 +86,6 @@ static const std::map<std::string, std::array<std::string, 2>> BORDERS = {
     {"W", {"0145hjnp", "028b"}}
 };
 
-// Maps a character index to the new character's index for a specific direction
 static const std::map<std::string, std::array<std::string, 2>> NEIGHBORS = {
     {"N", {"bcdefghjklmnpqrstuvwxyz0123456789", "fg45238967debc01yzhrstjnpqwvxy"}},
     {"S", {"0145hjnpqrstuvwxyz2389czfbpqrhjk", "0145hjnpqrstuvwxyz2389czfbpqrhjk"}},
@@ -123,10 +100,8 @@ std::string getGeohashNeighbor(const std::string& hash, const std::string& direc
     char lastChar = hash.back();
     std::string parentHash = hash.substr(0, hash.length() - 1);
 
-    // Parity: 0 for odd length, 1 for even length
     int parity = (hash.length() % 2 == 0) ? 1 : 0;
 
-    // Check for border crossing (requires recursion on parent hash)
     if (BORDERS.at(direction)[parity].find(lastChar) != std::string::npos) {
         parentHash = getGeohashNeighbor(parentHash, direction);
     }
@@ -149,11 +124,9 @@ std::string getGeohashNeighbor(const std::string& hash, const std::string& direc
 std::unordered_set<std::string> getGeohashSearchArea(double latitude, double longitude, int precision) {
     std::unordered_set<std::string> geohashes;
 
-    // 1. Calculate the central geohash
     std::string centerHash = encodeGeohash(latitude, longitude, precision);
     geohashes.insert(centerHash);
 
-    // Cardinal directions (N, E, S, W)
     std::string n = getGeohashNeighbor(centerHash, "N");
     std::string e = getGeohashNeighbor(centerHash, "E");
     std::string s = getGeohashNeighbor(centerHash, "S");
@@ -164,7 +137,6 @@ std::unordered_set<std::string> getGeohashSearchArea(double latitude, double lon
     geohashes.insert(s);
     geohashes.insert(w);
 
-    // Diagonal neighbors (NE, SE, SW, NW)
     if (!n.empty()) geohashes.insert(getGeohashNeighbor(n, "E"));
     if (!n.empty()) geohashes.insert(getGeohashNeighbor(n, "W"));
     if (!s.empty()) geohashes.insert(getGeohashNeighbor(s, "E"));
@@ -173,4 +145,4 @@ std::unordered_set<std::string> getGeohashSearchArea(double latitude, double lon
     return geohashes;
 }
 
-} // namespace GeoFilter
+}
