@@ -14,6 +14,10 @@
 #include "user_prefs.h"
 #include "assign_coords.h"
 #include "city_coords.h"
+#include "find_closest.h"
+#include "find_city_coords.h"
+#include "globals.h"
+
 using namespace std;
 
 
@@ -21,74 +25,9 @@ double userLat = 0.0;
 double userLon = 0.0;
 string userCityState = "";
 
-
-struct HospitalResult {
-    Hospital hospital;
-    double distanceKm;
-    double score;
-};
-
-
 vector<HospitalResult> topHospitals;
 
 constexpr double MILE_TO_KM = 1.60934;
-
-// Helper function to find coordinates for a city name (simple search)
-bool findCityCoords(const string& cityName, const unordered_map<string,pair<double, double>>& coords, double& lat, double& lon, string& foundCityState) {
-    string standardizedCity = cityName;
-
-    for (auto& pair : coords) {
-        size_t commaPos = pair.first.find(',');
-        if (commaPos != string::npos) {
-            string keyCity = pair.first.substr(0, commaPos);
-
-            if (keyCity == standardizedCity) {
-                lat = pair.second.first;
-                lon = pair.second.second;
-                foundCityState = pair.first;
-                return true;
-            }
-        }
-    }
-    return false;
-}
-UserPreferences makeUserPreferences(int maxdist, const vector<int>& weights) {
-    UserPreferences prefs;
-    prefs.timeliness = weights[0];
-    prefs.effectiveness = weights[1];
-    prefs.experience = weights[2];
-    prefs.distance = weights[3];
-    prefs.preventive = weights[4];
-    prefs.emergency = weights[5];
-    prefs.maxdist = maxdist;
-    return prefs;
-}
-
-vector<HospitalResult> findClosestHospitals(
-    const vector<Hospital>& allHospitals,
-    double uLat,
-    double uLon,
-    double maxDistanceMiles,
-    const vector<int>& weights
-) {
-    vector<HospitalResult> results;
-
-    UserPreferences prefs = makeUserPreferences(maxDistanceMiles, weights);
-
-    auto scored = compute(const_cast<vector<Hospital>&>(allHospitals), uLat, uLon, prefs);
-
-    for (auto &entry : scored) {
-    HospitalResult hr;
-    hr.hospital = *(entry.second);
-    hr.distanceKm = GeoFilter::haversine(uLat, uLon, hr.hospital.latitude, hr.hospital.longitude) * 1.60934;
-    hr.score = entry.first;
-    results.push_back(hr);
-    if (results.size() >= 5) break;
-     }
-     return results;
- }
-
-
 
 int main() {
 
@@ -381,7 +320,7 @@ int main() {
                             //Everything was successful
                             else if (distanceEnter) {
                                 double radiusKm = userDistanceMiles * MILE_TO_KM;
-                                topHospitals = findClosestHospitals(hospitals, userLat, userLon, radiusKm, weights);
+                                topHospitals = findClosestHospitals(hospitals, userLat, userLon, radiusKm, weights, DSindicator);
 
                                 sf::Text success("Location and radius set successfully!", font, 36);
                                 success.setFillColor(sf::Color::Green);
@@ -672,7 +611,16 @@ int main() {
                                     window.draw(scoreDistText);
                                 }
                             }
-
+                            if (runtime > 0.0f) {
+                                stringstream rtStream;
+                                rtStream.precision(3);
+                                rtStream << fixed << "Search runtime: " << runtime << " seconds";
+                                sf::Text runtimeText(rtStream.str(), font, 20);
+                                runtimeText.setFillColor(sf::Color::Magenta);
+                                sf::FloatRect rtBounds = runtimeText.getLocalBounds();
+                                runtimeText.setPosition((1200 - rtBounds.width) / 2, 720);
+                                window.draw(runtimeText);
+                            }
                             sf::Text escText("Press ESC to return to main menu", font, 18);
                             escText.setFillColor(sf::Color::Green);
                             sf::FloatRect escBound=escText.getLocalBounds();

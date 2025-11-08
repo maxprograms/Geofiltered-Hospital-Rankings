@@ -1,4 +1,4 @@
-#include "../include/geofilter.h"
+#include "../include/geohash_geofilter.h"
 #include "../include/hospital.h"
 #include <cmath>
 #include <sstream>
