@@ -10,7 +10,7 @@
 #include <cmath>
 #include "geofilter.h"
 #include "hospital.h"
-// #include "scoring.h"
+#include "scoring.h"
 #include "csv_parser.h"
 #include "user_prefs.h"
 #include "assign_coords.h"
@@ -76,19 +76,17 @@ vector<HospitalResult> findClosestHospitals(
 
     UserPreferences prefs = makeUserPreferences(maxDistanceMiles, weights);
 
-    // auto scored = compute(const_cast<vector<Hospital>&>(allHospitals), uLat, uLon, prefs);
+    auto scored = compute(const_cast<vector<Hospital>&>(allHospitals), uLat, uLon, prefs);
 
-    // for (auto &entry : scored) {
-    //     HospitalResult hr;
-    //     hr.hospital = *(entry.second);
-    //     hr.distanceKm = GeoFilter::haversine(uLat, uLon, hr.hospital.latitude, hr.hospital.longitude) * 1.60934;
-    //     hr.score = entry.first;
-    //     results.push_back(hr);
-//
-//         if (results.size() >= 5) break;
-//     }
-//
-//     return results;
+    for (auto &entry : scored) {
+    HospitalResult hr;
+    hr.hospital = *(entry.second);
+    hr.distanceKm = GeoFilter::haversine(uLat, uLon, hr.hospital.latitude, hr.hospital.longitude) * 1.60934;
+    hr.score = entry.first;
+    results.push_back(hr);
+    if (results.size() >= 5) break;
+     }
+     return results;
  }
 
 
