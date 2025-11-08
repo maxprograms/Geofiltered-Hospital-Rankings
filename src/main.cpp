@@ -975,7 +975,7 @@ int main() {
                            Title.setPosition((1200- TitleBounds.width) / 2, 50);
                            window.draw(Title);
 
-                           sf::Text Instruction("To use a geohash data structure press 1 and enter. To use an Octree data structure press 2 and enter", font, 22);
+                           sf::Text Instruction("To use a geohash data structure press 1 and enter. To use an Quadtree data structure press 2 and enter", font, 22);
                            Instruction.setFillColor(sf::Color::Blue);
                            Instruction.setStyle(sf::Text::Bold);
                            sf::FloatRect InstructionBounds = Instruction.getLocalBounds();
