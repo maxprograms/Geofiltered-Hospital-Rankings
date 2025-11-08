@@ -24,7 +24,7 @@ add_executable(GeofilteredHospitalRankings
         src/assign_coords.cpp
         src/city_coords.cpp
         src/csv_parser.cpp
-        src/geofilter.cpp
+        src/geohash_geofilter.cpp
         src/scoring.cpp
 )
 target_compile_features(GeofilteredHospitalRankings PRIVATE cxx_std_11)
@@ -35,5 +35,4 @@ target_link_libraries(GeofilteredHospitalRankings PRIVATE sfml-graphics sfml-win
 # Include directories for SFML 2.6.1
 target_include_directories(GeofilteredHospitalRankings PRIVATE
         ${CMAKE_SOURCE_DIR}/include
-        ${sfml_SOURCE_DIR}/include
 )
