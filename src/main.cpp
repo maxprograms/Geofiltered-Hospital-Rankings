@@ -902,7 +902,7 @@ int main() {
                        if (DSindicator == 1) {
                            DS = "Geohash data structure";
                        } else if (DSindicator == 2) {
-                           DS = "Octree data structure";
+                           DS = "Quadtree data structure";
                        }
 
                        while (Option6 &&window.isOpen()) {
@@ -921,7 +921,7 @@ int main() {
                                            DSindicator = 1;
                                        }
                                        else if (userInput == "2") {
-                                           DS = "Octree data structure";
+                                           DS = "Quadtree data structure";
                                            DSindicator = 2;
                                        }
                                        userInput="";
