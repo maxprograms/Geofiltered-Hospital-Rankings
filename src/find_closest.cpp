@@ -39,7 +39,7 @@ vector<HospitalResult> findClosestHospitals(
 
     // Filters hospitals based on data structure
     if (DSindicator == 1) {
-        int geohashPrecision = 5;
+        int geohashPrecision = 3;
         unordered_set<string> nearbyHashes = GeoFilter::getGeohashSearchArea(uLat, uLon, geohashPrecision);
 
         for (const auto& h : allHospitals) {
