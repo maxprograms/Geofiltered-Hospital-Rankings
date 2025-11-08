@@ -84,20 +84,20 @@ vector<HospitalResult> findClosestHospitals(
     //     hr.distanceKm = GeoFilter::haversine(uLat, uLon, hr.hospital.latitude, hr.hospital.longitude) * 1.60934;
     //     hr.score = entry.first;
     //     results.push_back(hr);
-    //
-    //     if (results.size() >= 5) break;
-    // }
-
-    return results;
-}
+//
+//         if (results.size() >= 5) break;
+//     }
+//
+//     return results;
+ }
 
 
 
 int main() {
-    //
-    // vector<Hospital> hospitals = parseHospitalCSV("../data/hospitals.csv");
-    // unordered_map<string, pair<double, double>> coords = loadCityCoords("../data/uscities.csv");
-    // assignCoordinates(hospitals, coords);
+
+    vector<Hospital> hospitals = parseHospitalCSV("../data/hospitals.csv");
+    unordered_map<string, pair<double, double>> coords = loadCityCoords("../data/uscities.csv");
+    assignCoordinates(hospitals, coords);
 
     sf::RenderWindow window(sf::VideoMode(1200, 800), "MedMetrics");
     window.setFramerateLimit(60);
@@ -190,15 +190,15 @@ int main() {
                                 if (Opt1Event.type == sf::Event::KeyPressed && Opt1Event.key.code == sf::Keyboard::Enter) {
                                     if (!inputName.empty() && !nameFound) {
                                         nameEnteredOnce = true;
-                                        // if (findCityCoords(inputName, coords, userLat, userLon, userCityState)) {
-                                        //     nameFound = true;
-                                        //     cityNameDisplay = inputName;
-                                        //     city = inputName;
-                                        //     cityNameDisplay[0] = toupper(cityNameDisplay[0]);
-                                        // }
-                                        // else {
-                                        //     inputName = "";
-                                        // }
+                                        if (findCityCoords(inputName, coords, userLat, userLon, userCityState)) {
+                                            nameFound = true;
+                                            cityNameDisplay = inputName;
+                                            city = inputName;
+                                            cityNameDisplay[0] = toupper(cityNameDisplay[0]);
+                                        }
+                                        else {
+                                            inputName = "";
+                                        }
                                     }
 
                                     else if (nameFound && !inputDistance.empty() && !distanceEnter) {
@@ -323,7 +323,7 @@ int main() {
                             //Everything was successful
                             else if (distanceEnter) {
                                 double radiusKm = userDistanceMiles * MILE_TO_KM;
-                                // topHospitals = findClosestHospitals(hospitals, userLat, userLon, radiusKm, weights);
+                                topHospitals = findClosestHospitals(hospitals, userLat, userLon, radiusKm, weights);
 
                                 sf::Text success("Location and radius set successfully!", font, 36);
                                 success.setFillColor(sf::Color::Green);
@@ -953,6 +953,7 @@ int main() {
                            sf::FloatRect backBounds = backText.getLocalBounds();
                            backText.setPosition((1200 - backBounds.width) / 2, 750);
                            window.draw(backText);
+                           window.display();
                        }
                    }
 
@@ -1033,6 +1034,7 @@ int main() {
                             sf::FloatRect backBounds = backText.getLocalBounds();
                             backText.setPosition((1200 - backBounds.width) / 2, 750);
                             window.draw(backText);
+                            window.display();
                         }
                     }
 
@@ -1044,8 +1046,6 @@ int main() {
             }
         }
 
-        // Drawing main menu
-        if (choice == 0 || (choice >= 1 && choice <= 8 && !window.pollEvent(event))) {
             window.clear(sf::Color::White);
             window.draw(titleText);
             window.draw(subtitleText);
@@ -1060,10 +1060,9 @@ int main() {
                 sf::FloatRect statusBounds = locationStatus.getLocalBounds();
                 locationStatus.setPosition((1200 - statusBounds.width) / 2, 230);
                 window.draw(locationStatus);
-            }
 
-            window.display();
         }
+        window.display();
     }
 
     return 0;
