@@ -52,6 +52,8 @@ bool findCityCoords(const string& cityName, const unordered_map<string,pair<doub
     }
     return false;
 }
+
+//prepares weights for userpreferences
 UserPreferences makeUserPreferences(int maxdist, const vector<int>& weights) {
     UserPreferences prefs;
     prefs.timeliness = weights[0];
@@ -91,7 +93,6 @@ vector<HospitalResult> findClosestHospitals(
 
 
 int main() {
-
     vector<Hospital> hospitals = parseHospitalCSV("../data/hospitals.csv");
     unordered_map<string, pair<double, double>> coords = loadCityCoords("../data/uscities.csv");
     assignCoordinates(hospitals, coords);
@@ -104,6 +105,7 @@ int main() {
         return -1;
     }
 
+    //Create window for main menu
     sf::Text titleText("Welcome to MedMetrics", font, 40);
     titleText.setFillColor(sf::Color::Blue);
     titleText.setStyle(sf::Text::Bold);
@@ -149,6 +151,7 @@ int main() {
     int userDistanceMiles = 0;
     string stateInitials = "";
     bool citySelected = false;
+    
     // Main loop
     while (window.isOpen()) {
         sf::Event event;
@@ -160,6 +163,8 @@ int main() {
             if (event.type == sf::Event::KeyPressed) {
                 if (event.key.code >= sf::Keyboard::Num1 && event.key.code <= sf::Keyboard::Num8) {
                     choice = event.key.code - sf::Keyboard::Num1 + 1;
+
+                    //Option 1 - stores user's input for city, state initials, and maximum distance
                     if (choice == 1) {
                         sf::Event clearEvent;
                         while (window.pollEvent(clearEvent)) {}
@@ -186,9 +191,11 @@ int main() {
                                 }
 
                                 if (Opt1Event.type == sf::Event::KeyPressed && Opt1Event.key.code == sf::Keyboard::Enter) {
+                                    //check if name of city is inputted, if so transiition to the state initla input screen
                                     if (!inputName.empty() && !stateEnter) {
                                         stateEnter = true;
                                     }
+                                    //once state initial enters, check if both city name and state initial is valid
                                     else if (stateEnter && !inputState.empty() && !nameFound) {
                                         nameEnteredOnce = true;
                                         if (findCityCoords(inputName, inputState, coords, userLat, userLon, userCityState)) {
@@ -198,12 +205,14 @@ int main() {
                                             stateInitials = inputState;
                                             cityNameDisplay[0] = toupper(cityNameDisplay[0]);
                                         }
+                                        //reset city name and state initial if both inputs were invalid
                                         else {
                                             inputName = "";
                                             inputState = "";
                                             stateEnter = false;
                                         }
                                     }
+                                        
                                     else if (nameFound && !inputDistance.empty() && !distanceEnter) {
                                         bool isValidNumber = true;
                                         for (char c : inputDistance) {
@@ -212,7 +221,7 @@ int main() {
                                                 break;
                                             }
                                         }
-
+                                        //checks if input for distance is valid
                                         if (isValidNumber) {
                                             int distanceValue = stoi(inputDistance);
                                             if (distanceValue > 0 && distanceValue < 1000) {
@@ -272,7 +281,7 @@ int main() {
                             sf::FloatRect titleBound = title.getLocalBounds();
                             title.setPosition((1200 - titleBound.width) / 2, 50);
                             window.draw(title);
-
+                            //city input screen
                             if (!nameFound  && !nameEnteredOnce && !stateEnter) {
                                 sf::Text prompt1("Enter your city name:", font, 30);
                                 prompt1.setFillColor(sf::Color::Black);
@@ -346,6 +355,7 @@ int main() {
 
                                 citySelected = false;
                             }
+                            //window for distance input 
                             else if (nameFound && !distanceEnter) {
                                 sf::Text distancePrompt("Enter maximum distance (miles) from " + cityNameDisplay + ":", font, 30);
                                 distancePrompt.setFillColor(sf::Color::Black);
@@ -408,9 +418,7 @@ int main() {
                     if (choice == 2) {
                         int selected= 0;
                         string inputString = "";
-
                         bool Option2 = true;
-
                         vector<string> factors = {
                             "Timeliness of care",
                             "Effectiveness of treatment",
@@ -447,7 +455,6 @@ int main() {
                                                 break;
                                             }
                                         }
-
                                         if (weightValid && inputString.length() == 1) {
                                             int newWeight = inputString[0] - '0';
                                             weights[selected] = newWeight;
@@ -476,8 +483,9 @@ int main() {
                                     }
                                 }
                             }
+                            //display menu for option 2
                             window.clear(sf::Color::White);
-
+                            //title
                             sf::Text title("Customize Hospital Priorities", font, 40);
                             title.setFillColor(sf::Color::Blue);
                             title.setStyle(sf::Text::Bold);
@@ -491,7 +499,7 @@ int main() {
                             sf::FloatRect instructionBounds = instruction.getLocalBounds();
                             instruction.setPosition((1200 - instructionBounds.width) / 2, 100);
                             window.draw(instruction);
-
+                            //iterates through to display each weight category and user's weight
                             for (int i = 0; i < 6; i++) {
                                 sf::Text factorText(to_string(i+1) + ". " + factors[i] + ": [ " + to_string(weights[i]) + " ]",
                                     font, 28);
@@ -500,7 +508,7 @@ int main() {
                                 factorText.setPosition((1200 - factorBounds.width) / 2, 150 + i * 60);
 
                                 weightBounds[i] = factorText.getGlobalBounds();
-
+                                //outline the red box to let the user know a category is selected 
                                 if (i == selected) {
                                     sf::RectangleShape selectionBox(sf::Vector2f(factorBounds.width + 20, factorBounds.height + 15));
                                     selectionBox.setFillColor(sf::Color::Transparent);
@@ -513,7 +521,7 @@ int main() {
                                 window.draw(factorText);
                             }
 
-                            // Selected weight info
+                            //Selected weight info
                             sf::Text selectedInfo("Selected: " + factors[selected], font, 24);
                             selectedInfo.setFillColor(sf::Color::Red);
                             selectedInfo.setStyle(sf::Text::Bold);
@@ -521,7 +529,6 @@ int main() {
                             selectedInfo.setPosition((1200 - infoBounds.width) / 2, 500);
                             window.draw(selectedInfo);
 
-                            // Current weight value
                             sf::Text currentWeight("Current value: " + to_string(weights[selected]), font, 22);
                             currentWeight.setFillColor(sf::Color::Blue);
                             sf::FloatRect currentWeightBounds = currentWeight.getLocalBounds();
@@ -548,23 +555,22 @@ int main() {
                                 inputDisplay.setPosition((1200 - inputDisplayBounds.width) / 2, 600);
                                 window.draw(inputDisplay);
                             } else {
-                                // Show message when empty
+                                //User input box text
                                 sf::Text placeholder("type here", font, 20);
                                 placeholder.setFillColor(sf::Color::Black);
                                 sf::FloatRect placeholderBounds = placeholder.getLocalBounds();
                                 placeholder.setPosition((1200 - placeholderBounds.width) / 2, 600);
                                 window.draw(placeholder);
                             }
-
                             sf::Text navText("Press ENTER to apply, ESC to return to main menu", font, 20);
                             navText.setFillColor(sf::Color::Green);
                             sf::FloatRect navBounds = navText.getLocalBounds();
                             navText.setPosition((1200 - navBounds.width) / 2, 700);
                             window.draw(navText);
-
                             window.display();
                         }
                     }
+                    
                     //Option 3 - View Recommended Hospitals
                     if (choice==3) {
                         sf::Event clearEvent;
@@ -682,6 +688,7 @@ int main() {
                             window.display();
                         }
                     }
+                    
                     //Option 4 - Display Hospital Details
                     if (choice==4) {
                         sf::Event clearEvent;
