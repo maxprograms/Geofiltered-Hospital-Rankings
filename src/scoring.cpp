@@ -1,10 +1,10 @@
+
 #include "hospital.h"
 #include "user_prefs.h"
 #include <vector>
 #include <cmath>
 #include <algorithm>
 #include <iostream>
-#include <iomanip>
 using namespace std;
 
 constexpr double EARTH_RADIUS_MI = 3958.8;
@@ -12,7 +12,6 @@ constexpr double EARTH_RADIUS_MI = 3958.8;
 double degrees_to_radians(double degrees) {
   return degrees * M_PI / 180.0;
 }
-
 double haversine_distance(double lat1, double lon1, double lat2, double lon2) {
   double lat = degrees_to_radians(lat2 - lat1);
   double lon = degrees_to_radians(lon2 - lon1);
@@ -26,7 +25,7 @@ double normalize(const string &rating) {
   if (rating == "Above") {
     return 1.0;
  }
-  if (rating == "Same") {
+  if (rating == "Average") {
     return 0.6;
  }
   if (rating == "Below") {
@@ -52,7 +51,7 @@ vector<pair<double, const Hospital*>> compute(vector<Hospital> &hospitals, doubl
     double p = normalize(h.readmission);
     double distscore = 1.0 - min(distance / prefs.maxdist, 1.0);
 
-    double total = prefs.timeliness * t + prefs.effectiveness * e + prefs.experience * x + prefs.emergency * em + prefs.preventive * p + prefs.maxdist * distscore;
+    double total = prefs.timeliness * t + prefs.effectiveness * e + prefs.experience * x + prefs.emergency * em + prefs.preventive * p + prefs.distance * distscore;
     scored.emplace_back(total, &h);
   }
 

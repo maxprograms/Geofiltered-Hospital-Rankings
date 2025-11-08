@@ -82,13 +82,13 @@ std::vector<Hospital> parseHospitalCSV(const std::string& filename) {
         }
 
         // Convert string ratings to double scores (1.0 to 5.0)
-        h.mortality = convertRatingToDouble(fields[5]);
+
         h.safety = convertRatingToDouble(fields[6]);
         h.readmission = convertRatingToDouble(fields[7]);
         h.experience = convertRatingToDouble(fields[8]);
         h.effectiveness = convertRatingToDouble(fields[9]);
         h.timeliness = convertRatingToDouble(fields[10]);
-        h.imaging = convertRatingToDouble(fields[11]);
+
 
         // The remaining 12 fields (fields[12] through fields[23]) are ignored.
 

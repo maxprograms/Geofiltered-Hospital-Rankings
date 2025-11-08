@@ -9,6 +9,7 @@
 #include <cmath> // For std::stod
 #include "geofilter.h"
 #include "hospital.h"
+#include "scoring.h"
 #include "csv_parser.h"
 #include "user_prefs.h"
 #include "assign_coords.h"
@@ -58,58 +59,46 @@ bool findCityCoords(const std::string& cityName, const std::unordered_map<std::s
     }
     return false;
 }
+UserPreferences makeUserPreferences(int maxdist, const vector<int>& weights) {
+    UserPreferences prefs;
+    prefs.timeliness = weights[0];
+    prefs.effectiveness = weights[1];
+    prefs.experience = weights[2];
+    prefs.distance = weights[3];
+    prefs.preventive = weights[4];
+    prefs.emergency = weights[5];
+    prefs.maxdist = maxdist;
+    return prefs;
+}
 
-std::vector<HospitalResult> findClosestHospitals(
-    const std::vector<Hospital>& allHospitals,
+vector<HospitalResult> findClosestHospitals(
+    const vector<Hospital>& allHospitals,
     double uLat,
     double uLon,
-    double radiusKm,
-    const std::vector<int>& weights
+    double maxDistanceMiles,
+    const vector<int>& weights
 ) {
+    vector<HospitalResult> results;
 
+    // Create UserPreferences
+    UserPreferences prefs = makeUserPreferences(maxDistanceMiles, weights);
 
-    // Step 1: Filter by Distance (Haversine on all hospitals for now)
-    std::vector<Hospital> distanceFiltered = GeoFilter::filterByDistance(
-        allHospitals, uLat, uLon, radiusKm
-    );
+    // Compute scores
+    auto scored = compute(const_cast<vector<Hospital>&>(allHospitals), uLat, uLon, prefs);
 
-    // Step 2: Scoring and Result Struct creation
-    std::vector<HospitalResult> scoredResults;
-    scoredResults.reserve(distanceFiltered.size());
+    for (auto &entry : scored) {
+        HospitalResult hr;
+        hr.hospital = *(entry.second);
+        hr.distanceKm = GeoFilter::haversine(uLat, uLon, hr.hospital.latitude, hr.hospital.longitude) * 1.60934; // km
+        hr.score = entry.first;
+        results.push_back(hr);
 
-    for (const auto& h : distanceFiltered) {
-        HospitalResult res;
-        res.hospital = h;
-        res.distanceKm = GeoFilter::haversine(uLat, uLon, h.latitude, h.longitude);
-
-        // Placeholder Score Calculation:
-        // This is a dummy score based *only* on distance until the actual quality metrics
-        // in the Hospital struct are fully integrated with the weights.
-        if (radiusKm > 0) {
-            // Score is better if closer (closer to 1.0)
-            res.score = 1.0 - (res.distanceKm / radiusKm);
-        } else {
-            res.score = 1.0;
-        }
-
-        scoredResults.push_back(res);
+        if (results.size() >= 10) break; // top 10
     }
 
-    // Step 3: Sort by Score (Descending) and Distance (Ascending)
-    std::sort(scoredResults.begin(), scoredResults.end(), [](const HospitalResult& a, const HospitalResult& b) {
-        if (a.score != b.score) {
-            return a.score > b.score; // Higher score is better
-        }
-        return a.distanceKm < b.distanceKm; // Closer distance is better
-    });
-
-    // Step 4: Return top 10
-    if (scoredResults.size() > 10) {
-        scoredResults.resize(10);
-    }
-
-    return scoredResults;
+    return results;
 }
+
 
 
 int main() {
