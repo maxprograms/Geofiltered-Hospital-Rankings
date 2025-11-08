@@ -684,7 +684,6 @@ int main() {
                                     "Preventive care"
                                 };
 
-                                // Title
                                 sf::Text title("Hospital Details", font, 40);
                                 title.setFillColor(sf::Color::Blue);
                                 title.setStyle(sf::Text::Bold);
@@ -692,7 +691,6 @@ int main() {
                                 title.setPosition((1200 - titleBounds.width) / 2, 50);
                                 window.draw(title);
 
-                                // Hospital Name
                                 sf::Text hospitalName("Details for: [hospital Name]", font, 32);
                                 hospitalName.setFillColor(sf::Color::Black);
                                 hospitalName.setStyle(sf::Text::Bold);
@@ -757,7 +755,7 @@ int main() {
 
                     //Option 5 - Export Results
                     if (choice == 5) {
-                         sf::Event clearEvent;
+                        sf::Event clearEvent;
                         while (window.pollEvent(clearEvent)) {}
                         bool Option5 = true;
                         string userInput = "";
@@ -775,46 +773,56 @@ int main() {
 
                                 if (Opt5Event.type == sf::Event::KeyPressed && Opt5Event.key.code == sf::Keyboard::Enter) {
                                     if (userInput == "Y" || userInput == "y") {
-                                        // Export results
-                                        ofstream file("results.txt");
-                                        if (file.is_open()) {
+                                        if (!citySelected || userDistanceMiles == 0) {
+                                        } else {
+                                            ofstream file("results.txt");
+                                            if (file.is_open()) {
+                                                file << "MedMetrics Results\n";
+                                                file << "==================\n\n";
 
-                                            file << "Results\n";
-                                            file << "=======\n";
-                                            file << "Top 5 Recommended Hospitals:\n";
-                                            file << "----------------------------\n";
+                                                file << "Location Information:\n";
+                                                file << "---------------------\n";
+                                                file << "City: " << city << "\n";
+                                                file << "Search Radius: " << userDistanceMiles << " miles\n\n";
 
-                                            //REPLACE PLACEHOLDERS
-                                            for (int i = 0; i < 5; i++) {
-                                                file << i + 1 << ". [Hospital Name] - [City, State] - Score: [score]\n";
+                                                file << "Category Weights (1-5):\n";
+                                                file << "-----------------------\n";
+                                                vector<string> categories = {
+                                                    "Timeliness of care", "Effectiveness of treatment", "Patient experience",
+                                                    "Distance", "Preventive care", "Emergency department quality"
+                                                };
+
+                                                for (int i = 0; i < categories.size() && i < weights.size(); i++) {
+                                                    file << "- " << categories[i] << ": " << weights[i] << "\n";
+                                                }
+                                                file << "\n";
+
+                                                file << "Top Recommended Hospitals:\n";
+                                                file << "--------------------------\n";
+
+                                                if (topHospitals.empty()) {
+                                                    file << "No hospitals found within " << userDistanceMiles << " miles of " << city << ".\n";
+                                                } else {
+                                                    for (size_t i = 0; i < topHospitals.size(); ++i) {
+                                                        auto result = topHospitals[i];
+                                                        double distanceMiles = result.distanceKm / MILE_TO_KM;
+
+                                                        file << i + 1 << ". " << result.hospital.name
+                                                             << " - " << result.hospital.city << ", " << result.hospital.state
+                                                             << " - Score: " << fixed << result.score
+                                                             << " - Distance: " << fixed << distanceMiles << " miles\n";
+                                                    }
+                                                }
+
+                                                file << "\n";
+                                                file << "Generated by MedMetrics\n";
+                                                file.close();
+                                                exportSuccess = true;
                                             }
-
-                                            file << "\n";
-                                            file << "Inputs\n";
-                                            file << "------\n";
-
-                                            // Replace placeholders
-                                            file << "Location: " << "[City Name]" << "\n";
-                                            file << "Search Radius: " << "[distance] miles" << "\n\n";
-
-                                            // Weights
-                                            file << "Category Weights (1-5):\n";
-                                            vector<string> categories = {
-                                                "Timeliness of care", "Effectiveness of treatment", "Patient experience",
-                                                "Distance", "Preventive care", "Emergency department quality"
-                                            };
-
-                                            for (int i = 0; i < categories.size() && i < weights.size(); i++) {
-                                                file << "- " << categories[i] << ": " << weights[i] << "\n";
-                                            }
-
-                                            file.close();
-                                            exportSuccess = true;
                                         }
                                     }
                                     userInput = "";
                                 }
-
 
                                 if (Opt5Event.type == sf::Event::TextEntered) {
                                     if (Opt5Event.text.unicode == '\b' && !userInput.empty()) {
@@ -832,15 +840,22 @@ int main() {
                             title.setFillColor(sf::Color::Blue);
                             title.setStyle(sf::Text::Bold);
                             sf::FloatRect titleBounds = title.getLocalBounds();
-                            title.setPosition((1200 -titleBounds.width) / 2, 50);
+                            title.setPosition((1200 - titleBounds.width) / 2, 50);
                             window.draw(title);
 
-                            //export File
-                            if (!exportSuccess) {
+                            if (!citySelected || userDistanceMiles == 0) {
+                                sf::Text error("Cannot export, Location not set! Please complete option 1 and try again.", font, 30);
+                                error.setFillColor(sf::Color::Red);
+                                error.setStyle(sf::Text::Bold);
+                                sf::FloatRect errorBounds = error.getLocalBounds();
+                                error.setPosition((1200 - errorBounds.width) / 2, 200);
+                                window.draw(error);
+                            }
+                            else if (!exportSuccess) {
                                 sf::Text prompt("Would you like to export results?", font, 30);
                                 prompt.setFillColor(sf::Color::Black);
-                                sf::FloatRect promptBounds=prompt.getLocalBounds();
-                                prompt.setPosition((1200 -promptBounds.width) / 2, 150);
+                                sf::FloatRect promptBounds = prompt.getLocalBounds();
+                                prompt.setPosition((1200 - promptBounds.width) / 2, 150);
                                 window.draw(prompt);
 
                                 sf::RectangleShape inputBox(sf::Vector2f(200, 50));
@@ -853,13 +868,13 @@ int main() {
                                 sf::Text inputDisplay(userInput, font, 28);
                                 inputDisplay.setFillColor(sf::Color::Black);
                                 sf::FloatRect textBounds = inputDisplay.getLocalBounds();
-                                inputDisplay.setPosition((1200-textBounds.width) / 2, 225);
+                                inputDisplay.setPosition((1200 - textBounds.width) / 2, 225);
                                 window.draw(inputDisplay);
 
                                 sf::Text instruction("Type Y and press ENTER", font, 20);
                                 instruction.setFillColor(sf::Color::Green);
                                 sf::FloatRect instructionBounds = instruction.getLocalBounds();
-                                instruction.setPosition((1200-instructionBounds.width)/2, 300);
+                                instruction.setPosition((1200 - instructionBounds.width) / 2, 300);
                                 window.draw(instruction);
                             }
                             else {
@@ -874,14 +889,14 @@ int main() {
                                 sf::Text fileInfo("results.txt file created/updated", font, 28);
                                 fileInfo.setFillColor(sf::Color::Black);
                                 sf::FloatRect fileBounds = fileInfo.getLocalBounds();
-                                fileInfo.setPosition((1200 -fileBounds.width) / 2, 280);
+                                fileInfo.setPosition((1200 - fileBounds.width) / 2, 280);
                                 window.draw(fileInfo);
                             }
 
                             sf::Text escText("Press ESC to return to main menu", font, 25);
                             escText.setFillColor(sf::Color::Green);
                             sf::FloatRect escBounds = escText.getLocalBounds();
-                            escText.setPosition((1200- escBounds.width) / 2, 700);
+                            escText.setPosition((1200 - escBounds.width) / 2, 700);
                             window.draw(escText);
 
                             window.display();
