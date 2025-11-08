@@ -1,0 +1,15 @@
+# Ignore CMake build folders
+/build/
+make-build-debug/
+
+# Ignore CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Ignore object files and executables
+*.o
+*.obj
+*.exe
+

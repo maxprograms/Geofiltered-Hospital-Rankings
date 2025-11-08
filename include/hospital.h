@@ -8,12 +8,11 @@ struct Hospital {
     std::string type;
 
     double overall_rating = 0.0;
-    std::string timeliness;
-    std::string safety;
-    std::string experience;
-    std::string effectiveness;
-    std::string readmission;
-
+    double timeliness;
+    double safety;
+    double experience;
+    double effectiveness;
+    double readmission;
 
     double latitude = 0.0;
     double longitude = 0.0;

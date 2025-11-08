@@ -1,4 +1,3 @@
-
 #include "hospital.h"
 #include "user_prefs.h"
 #include <vector>
@@ -21,18 +20,18 @@ double haversine_distance(double lat1, double lon1, double lat2, double lon2) {
 }
 
 
-double normalize(const string &rating) {
-  if (rating == "Above") {
-    return 1.0;
- }
-  if (rating == "Average") {
-    return 0.6;
- }
-  if (rating == "Below") {
-    return 0.3;
- }
-  return 0.0;
-}
+// double normalize(const string &rating) {
+//   if (rating == "Above") {
+//     return 1.0;
+//  }
+//   if (rating == "Average") {
+//     return 0.6;
+//  }
+//   if (rating == "Below") {
+//     return 0.3;
+//  }
+//   return 0.0;
+// }
 
 vector<pair<double, const Hospital*>> compute(vector<Hospital> &hospitals, double userlat, double userlon, const UserPreferences &prefs) {
   vector<pair<double, const Hospital *>> scored;
@@ -44,11 +43,11 @@ vector<pair<double, const Hospital*>> compute(vector<Hospital> &hospitals, doubl
     if (distance > prefs.maxdist) {
       continue;
     }
-    double t = normalize(h.timeliness);
-    double e = normalize(h.effectiveness);
-    double x = normalize(h.experience);
-    double em = normalize(h.safety);
-    double p = normalize(h.readmission);
+    double t = h.timeliness;
+    double e = h.effectiveness;
+    double x = h.experience;
+    double em = h.safety;
+    double p = h.readmission;
     double distscore = 1.0 - min(distance / prefs.maxdist, 1.0);
 
     double total = prefs.timeliness * t + prefs.effectiveness * e + prefs.experience * x + prefs.emergency * em + prefs.preventive * p + prefs.distance * distscore;
