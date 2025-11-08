@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -6,10 +7,10 @@
 #include <fstream>
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
-#include <cmath> 
+#include <cmath>
 #include "geofilter.h"
 #include "hospital.h"
-#include "scoring.h"
+// #include "scoring.h"
 #include "csv_parser.h"
 #include "user_prefs.h"
 #include "assign_coords.h"
@@ -24,18 +25,18 @@ string userCityState = "";
 
 struct HospitalResult {
     Hospital hospital;
-    double distanceKm; 
-    double score;     
+    double distanceKm;
+    double score;
 };
 
 
-:vector<HospitalResult> topHospitals;
+vector<HospitalResult> topHospitals;
 
 constexpr double MILE_TO_KM = 1.60934;
 
 // Helper function to find coordinates for a city name (simple search)
 bool findCityCoords(const string& cityName, const unordered_map<string,pair<double, double>>& coords, double& lat, double& lon, string& foundCityState) {
-    :string standardizedCity = cityName;
+    string standardizedCity = cityName;
 
     for (auto& pair : coords) {
         size_t commaPos = pair.first.find(',');
@@ -75,17 +76,17 @@ vector<HospitalResult> findClosestHospitals(
 
     UserPreferences prefs = makeUserPreferences(maxDistanceMiles, weights);
 
-    auto scored = compute(const_cast<vector<Hospital>&>(allHospitals), uLat, uLon, prefs);
+    // auto scored = compute(const_cast<vector<Hospital>&>(allHospitals), uLat, uLon, prefs);
 
-    for (auto &entry : scored) {
-        HospitalResult hr;
-        hr.hospital = *(entry.second);
-        hr.distanceKm = GeoFilter::haversine(uLat, uLon, hr.hospital.latitude, hr.hospital.longitude) * 1.60934; 
-        hr.score = entry.first;
-        results.push_back(hr);
-
-        if (results.size() >= 5) break; 
-    }
+    // for (auto &entry : scored) {
+    //     HospitalResult hr;
+    //     hr.hospital = *(entry.second);
+    //     hr.distanceKm = GeoFilter::haversine(uLat, uLon, hr.hospital.latitude, hr.hospital.longitude) * 1.60934;
+    //     hr.score = entry.first;
+    //     results.push_back(hr);
+    //
+    //     if (results.size() >= 5) break;
+    // }
 
     return results;
 }
@@ -93,10 +94,10 @@ vector<HospitalResult> findClosestHospitals(
 
 
 int main() {
-
-    vector<Hospital> hospitals = parseHospitalCSV("../data/hospitals.csv");
-    unordered_map<:string, pair<double, double>> coords = loadCityCoords("../data/uscities.csv");
-    assignCoordinates(hospitals, coords);
+    //
+    // vector<Hospital> hospitals = parseHospitalCSV("../data/hospitals.csv");
+    // unordered_map<string, pair<double, double>> coords = loadCityCoords("../data/uscities.csv");
+    // assignCoordinates(hospitals, coords);
 
     sf::RenderWindow window(sf::VideoMode(1200, 800), "MedMetrics");
     window.setFramerateLimit(60);
@@ -149,7 +150,7 @@ int main() {
     int selectedHospitalInd = -1;
     int DSindicator = 1;
     string city = "";
-    int userDistanceMiles = 0; 
+    int userDistanceMiles = 0;
 
     bool citySelected = false;
     // Main loop
@@ -189,21 +190,21 @@ int main() {
                                 if (Opt1Event.type == sf::Event::KeyPressed && Opt1Event.key.code == sf::Keyboard::Enter) {
                                     if (!inputName.empty() && !nameFound) {
                                         nameEnteredOnce = true;
-                                        if (findCityCoords(inputName, coords, userLat, userLon, userCityState)) {
-                                            nameFound = true;
-                                            cityNameDisplay = inputName;
-                                            city = inputName;
-                                            cityNameDisplay[0] = toupper(cityNameDisplay[0]);
-                                        }
-                                        else {
-                                            inputName = ""; 
-                                        }
+                                        // if (findCityCoords(inputName, coords, userLat, userLon, userCityState)) {
+                                        //     nameFound = true;
+                                        //     cityNameDisplay = inputName;
+                                        //     city = inputName;
+                                        //     cityNameDisplay[0] = toupper(cityNameDisplay[0]);
+                                        // }
+                                        // else {
+                                        //     inputName = "";
+                                        // }
                                     }
 
                                     else if (nameFound && !inputDistance.empty() && !distanceEnter) {
                                         try {
-                                            int distanceValue = :stoi(inputDistance);
-                                            if (distanceValue > 0 && distanceValue < 1000) { 
+                                            int distanceValue = stoi(inputDistance);
+                                            if (distanceValue > 0 && distanceValue < 1000) {
                                                 distanceEnter = true;
                                                 userDistanceMiles = distanceValue;
                                             } else {
@@ -261,7 +262,7 @@ int main() {
                                 sf::FloatRect prompt1Bounds = prompt1.getLocalBounds();
                                 prompt1.setPosition((1200 - prompt1Bounds.width) / 2, 150);
                                 window.draw(prompt1);
-                                
+
                                 sf::RectangleShape inputBox(sf::Vector2f(600, 50));
                                 inputBox.setFillColor(sf::Color(240, 240, 240));
                                 inputBox.setOutlineColor(sf::Color::Blue);
@@ -322,7 +323,7 @@ int main() {
                             //Everything was successful
                             else if (distanceEnter) {
                                 double radiusKm = userDistanceMiles * MILE_TO_KM;
-                                topHospitals = findClosestHospitals(hospitals, userLat, userLon, radiusKm, weights);
+                                // topHospitals = findClosestHospitals(hospitals, userLat, userLon, radiusKm, weights);
 
                                 sf::Text success("Location and radius set successfully!", font, 36);
                                 success.setFillColor(sf::Color::Green);
@@ -737,6 +738,7 @@ int main() {
                             window.draw(instruction1);
 
                             window.display();
+                        }
                     }
 
                     //Option 5 - Export Results
@@ -873,91 +875,89 @@ int main() {
                     }
 
                    if (choice == 6) {
+                       bool Option6=true;
+                       string userInput="";
+                       string DS;
+                       if (DSindicator == 1) {
+                           DS = "Geohash data structure";
+                       } else if (DSindicator == 2) {
+                           DS = "Octree data structure";
+                       }
 
-                        bool Option6=true;
-                        string userInput="";
-                        string DS;
-                        if (DSindicator == 1) {
-                            DS = "Geohash data structure";
-                        } else if (DSindicator == 2) {
-                            DS = "Octree data structure";
-                        }
+                       while (Option6 &&window.isOpen()) {
+                           sf::Event Opt6event;
+                           while (window.pollEvent(Opt6event)) {
+                               if (Opt6event.type == sf::Event::Closed){
+                                   window.close();
+                               }
+                               if (Opt6event.type == sf::Event::KeyPressed){
+                                   if (Opt6event.key.code == sf::Keyboard::Escape) {
+                                       Option6=false;
+                                   }
+                                   else if (Opt6event.key.code == sf::Keyboard::Enter) {
+                                       if (userInput =="1") {
+                                           DS = "Geohash data structure";
+                                           DSindicator = 1;
+                                       }
+                                       else if (userInput == "2") {
+                                           DS = "Octree data structure";
+                                           DSindicator = 2;
+                                       }
+                                       userInput="";
+                                   }
+                               }
+                               if (Opt6event.type == sf::Event::TextEntered) {
+                                   if (Opt6event.text.unicode == '1') {
+                                       userInput = "1";
+                                   }
+                                   else if (Opt6event.text.unicode == '2') {
+                                       userInput = "2";
+                                   }
+                               }
+                           }
+                           window.clear(sf::Color::White);
 
-                        while (Option6 &&window.isOpen()) {
-                            sf::Event Opt6event;
-                            while (window.pollEvent(Opt6event)) {
-                                if (Opt6event.type == sf::Event::Closed){
-                                    window.close();
-                                }
-                                if (Opt6event.type == sf::Event::KeyPressed){
-                                    if (Opt6event.key.code == sf::Keyboard::Escape) {
-                                        Option6=false;
-                                    }
-                                    else if (Opt6event.key.code == sf::Keyboard::Enter) {
-                                        if (userInput =="1") {
-                                            DS = "Geohash data structure";
-                                            DSindicator = 1;
-                                        }
-                                        else if (userInput == "2") {
-                                            DS = "Octree data structure";
-                                            DSindicator = 2;
-                                        }
-                                        userInput="";
-                                    }
-                                }
-                                if (Opt6event.type == sf::Event::TextEntered) {
-                                    if (Opt6event.text.unicode == '1') {
-                                        userInput = "1";
-                                    }
-                                    else if (Opt6event.text.unicode == '2') {
-                                        userInput = "2";
-                                    }
-                                }
-                            }
-                            window.clear(sf::Color::White);
+                           sf::Text Title("Select which data structure you would like to use", font, 40);
+                           Title.setFillColor(sf::Color::Blue);
+                           Title.setStyle(sf::Text::Bold);
+                           sf::FloatRect TitleBounds = Title.getLocalBounds();
+                           Title.setPosition((1200- TitleBounds.width) / 2, 50);
+                           window.draw(Title);
 
-                            sf::Text Title("Select which data structure you would like to use", font, 40);
-                            Title.setFillColor(sf::Color::Blue);
-                            Title.setStyle(sf::Text::Bold);
-                            sf::FloatRect TitleBounds = Title.getLocalBounds();
-                            Title.setPosition((1200- TitleBounds.width) / 2, 50);
-                            window.draw(Title);
+                           sf::Text Instruction("To use a geohash data structure press 1 and enter. To use an Octree data structure press 2 and enter", font, 22);
+                           Instruction.setFillColor(sf::Color::Blue);
+                           Instruction.setStyle(sf::Text::Bold);
+                           sf::FloatRect InstructionBounds = Instruction.getLocalBounds();
+                           Instruction.setPosition((1200- InstructionBounds.width) / 2, 200);
+                           window.draw(Instruction);
 
-                            sf::Text Instruction("To use a geohash data structure press 1 and enter. To use an Octree data structure press 2 and enter", font, 22);
-                            Instruction.setFillColor(sf::Color::Blue);
-                            Instruction.setStyle(sf::Text::Bold);
-                            sf::FloatRect InstructionBounds = Instruction.getLocalBounds();
-                            Instruction.setPosition((1200- InstructionBounds.width) / 2, 200);
-                            window.draw(Instruction);
+                           if (DSindicator == 1) {
+                               sf::Text Instruction2("You have selected "+ DS, font, 25);
+                               Instruction2.setFillColor(sf::Color::Black);
+                               Instruction2.setStyle(sf::Text::Bold);
+                               sf::FloatRect Instruction2Bounds = Instruction2.getLocalBounds();
+                               Instruction2.setPosition((1200- Instruction2Bounds.width) / 2, 500);
+                               window.draw(Instruction2);
+                           }
+                           if (DSindicator == 2) {
+                               sf::Text Instruction2("You have selected "+ DS, font, 25);
+                               Instruction2.setFillColor(sf::Color::Black);
+                               Instruction2.setStyle(sf::Text::Bold);
+                               sf::FloatRect Instruction2Bounds = Instruction2.getLocalBounds();
+                               Instruction2.setPosition((1200- Instruction2Bounds.width) / 2, 500);
+                               window.draw(Instruction2);
+                           }
 
-                            if (DSindicator == 1) {
-                                sf::Text Instruction2("You have selected "+ DS, font, 25);
-                                Instruction2.setFillColor(sf::Color::Black);
-                                Instruction2.setStyle(sf::Text::Bold);
-                                sf::FloatRect Instruction2Bounds = Instruction2.getLocalBounds();
-                                Instruction2.setPosition((1200- Instruction2Bounds.width) / 2, 500);
-                                window.draw(Instruction2);
-                            }
-                            if (DSindicator == 2) {
-                                sf::Text Instruction2("You have selected "+ DS, font, 25);
-                                Instruction2.setFillColor(sf::Color::Black);
-                                Instruction2.setStyle(sf::Text::Bold);
-                                sf::FloatRect Instruction2Bounds = Instruction2.getLocalBounds();
-                                Instruction2.setPosition((1200- Instruction2Bounds.width) / 2, 500);
-                                window.draw(Instruction2);
-                            }
-
-                            sf::Text backText("Press ESC to return to main menu", font, 25);
-                            backText.setFillColor(sf::Color::Green);
-                            sf::FloatRect backBounds = backText.getLocalBounds();
-                            backText.setPosition((1200 - backBounds.width) / 2, 750);
-                            window.draw(backText);
-                    }
+                           sf::Text backText("Press ESC to return to main menu", font, 25);
+                           backText.setFillColor(sf::Color::Green);
+                           sf::FloatRect backBounds = backText.getLocalBounds();
+                           backText.setPosition((1200 - backBounds.width) / 2, 750);
+                           window.draw(backText);
+                       }
+                   }
 
                     //Option 7 - About
                     if (choice == 7) {
-                        if (choice==7){
-
                         bool Option7 = true;
                         while (Option7 && window.isOpen()){
                             sf::Event aboutEvent;
@@ -1033,6 +1033,7 @@ int main() {
                             sf::FloatRect backBounds = backText.getLocalBounds();
                             backText.setPosition((1200 - backBounds.width) / 2, 750);
                             window.draw(backText);
+                        }
                     }
 
                     //Option 8 - Exit
