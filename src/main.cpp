@@ -7,7 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
 #include <cmath>
-#include "geofilter.h"
+#include "geohash_geofilter.h"
 #include "hospital.h"
 #include "scoring.h"
 #include "csv_parser.h"
