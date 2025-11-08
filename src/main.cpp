@@ -191,7 +191,7 @@ int main() {
                                     }
                                     else if (stateEnter && !inputState.empty() && !nameFound) {
                                         nameEnteredOnce = true;
-                                        if (findCityCoords(inputName, coords, userLat, userLon, userCityState)) {
+                                        if (findCityCoords(inputName,inputState, coords, userLat, userLon, userCityState)) {
                                             nameFound = true;
                                             cityNameDisplay = inputName;
                                             city = inputName;
