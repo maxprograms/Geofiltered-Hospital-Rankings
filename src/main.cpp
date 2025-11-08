@@ -1,4 +1,5 @@
 
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -268,8 +269,23 @@ int main() {
                                 inputBox.setPosition(300, 220);
                                 window.draw(inputBox);
 
-                                sf::Text inputDisplay(inputName.empty() ? "Type Here (e.g., Dallas)" : inputName, font, 28);
-                                inputDisplay.setFillColor(inputName.empty() ? sf::Color(150, 150, 150) : sf::Color::Black);
+                                string displayText;
+                                if (inputName.empty()) {
+                                    displayText = "Type Here (e.g., Gainesville)";
+                                } else {
+                                    displayText = inputName;
+                                }
+
+                                sf::Text inputDisplay(displayText, font, 28);
+
+                                sf::Color textColor;
+                                if (inputName.empty()) {
+                                    textColor = sf::Color(150, 150, 150);
+                                } else {
+                                    textColor = sf::Color::Black;
+                                }
+                                inputDisplay.setFillColor(textColor);
+
                                 inputDisplay.setPosition(310, 225);
                                 window.draw(inputDisplay);
 
