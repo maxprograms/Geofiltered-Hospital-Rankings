@@ -267,7 +267,7 @@ int main() {
 
                                 string displayText;
                                 if (inputState.empty()) {
-                                    displayText = "Type Here (e.g., FL)";
+                                    displayText = "Type Here (e.g. FL)";
                                 } else {
                                     displayText = inputState;
                                 }
