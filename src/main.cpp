@@ -681,22 +681,36 @@ int main() {
                             // Instructions
                             window.clear(sf::Color::White);
 
-                            if (selectedHospitalInd == -1 && citySelected) {
-                                sf::Text instructionErrorTitle("No Hospital Details Displayed"
-                                    , font, 40);
+                            // User hasn't set location
+                            if (!citySelected) {
+                                sf::Text instructionErrorTitle("Location Not Set", font, 40);
                                 instructionErrorTitle.setFillColor(sf::Color::Red);
                                 sf::FloatRect instructionErrorTitleBounds = instructionErrorTitle.getLocalBounds();
                                 instructionErrorTitle.setPosition((1200 - instructionErrorTitleBounds.width) / 2, 100);
                                 window.draw(instructionErrorTitle);
 
-                                sf::Text instructionError("Please complete option 1 from the main menu or select a ranked hospital from option 3 before continuing"
-                                    , font, 25);
+                                sf::Text instructionError("Please complete option 1 from the main menu to set your location first", font, 25);
                                 instructionError.setFillColor(sf::Color::Green);
                                 sf::FloatRect instructionErrorBounds = instructionError.getLocalBounds();
                                 instructionError.setPosition((1200 - instructionErrorBounds.width) / 2, 200);
                                 window.draw(instructionError);
                             }
-                            else if (selectedHospitalInd >=0 && selectedHospitalInd <= 4 && citySelected) {
+                            // User set location but didn't select a hospital
+                            else if (selectedHospitalInd == -1) {
+                                sf::Text instructionErrorTitle("No Hospital Selected", font, 40);
+                                instructionErrorTitle.setFillColor(sf::Color::Red);
+                                sf::FloatRect instructionErrorTitleBounds = instructionErrorTitle.getLocalBounds();
+                                instructionErrorTitle.setPosition((1200 - instructionErrorTitleBounds.width) / 2, 100);
+                                window.draw(instructionErrorTitle);
+
+                                sf::Text instructionError("Please select a ranked hospital from option 3 before continuing", font, 25);
+                                instructionError.setFillColor(sf::Color::Green);
+                                sf::FloatRect instructionErrorBounds = instructionError.getLocalBounds();
+                                instructionError.setPosition((1200 - instructionErrorBounds.width) / 2, 200);
+                                window.draw(instructionError);
+                            }
+                            //user selected both hospital and location
+                            else {
                                 auto selectedHospital = topHospitals[selectedHospitalInd];
 
                                 sf::Text title("Hospital Details", font, 40);
