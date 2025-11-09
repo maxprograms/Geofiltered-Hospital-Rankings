@@ -236,7 +236,7 @@ int main() {
 
                                 string displayText;
                                 if (inputName.empty()) {
-                                    displayText = "Type Here (e.g., Gainesville)";
+                                    displayText = "Type Here (e.g. Gainesville)";
                                 } else {
                                     displayText = inputName;
                                 }
